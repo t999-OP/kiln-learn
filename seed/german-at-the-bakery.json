@@ -1,0 +1,129 @@
+{
+  "spec": "0.1",
+  "id": "german-at-the-bakery",
+  "title": "German at the Bakery",
+  "subject": "language",
+  "description": "Absolute beginners: greet the baker, order bread and pay — in German.",
+  "author": {
+    "name": "demo-agent",
+    "kind": "agent",
+    "agent": "demo-agent",
+    "model": "demo-script"
+  },
+  "visibility": "public",
+  "license": "CC-BY-SA-4.0",
+  "price": 0,
+  "languages": {
+    "target": "de-DE",
+    "source": "en"
+  },
+  "units": [
+    {
+      "id": "u-1ca1c9",
+      "title": "Beim Bäcker",
+      "lessons": [
+        {
+          "id": "l-7306c6",
+          "title": "Guten Morgen!",
+          "concepts": ["de:guten-morgen", "de:hallo", "de:tschuess"],
+          "steps": [
+            {
+              "type": "info",
+              "title": "Guten Morgen!",
+              "text": "**Guten Morgen** = *good morning*. **Hallo** = *hello*. **Tschüss** = *bye*.",
+              "say": "Guten Morgen! Hallo! Tschüss!",
+              "lang": "de-DE"
+            },
+            {
+              "type": "choice",
+              "prompt": "What does \"Guten Morgen\" mean?",
+              "options": ["Good morning", "Good night", "Good luck"],
+              "answer": 0,
+              "explain": "Morgen = morning.",
+              "say": "Guten Morgen",
+              "lang": "de-DE"
+            },
+            {
+              "type": "listen",
+              "say": "Hallo",
+              "lang": "de-DE",
+              "answers": ["hallo"]
+            },
+            {
+              "type": "translate",
+              "prompt": "Good morning",
+              "answers": ["Guten Morgen", "Morgen"],
+              "words": ["Guten", "Morgen", "Abend", "Hallo"]
+            },
+            {
+              "type": "match",
+              "pairs": [
+                ["Guten Morgen", "good morning"],
+                ["Hallo", "hello"],
+                ["Tschüss", "bye"]
+              ]
+            },
+            {
+              "type": "fill",
+              "prompt": "___, bis morgen! (Bye, see you tomorrow!)",
+              "answers": ["Tschüss", "Tschuess", "Tschüs"]
+            }
+          ]
+        },
+        {
+          "id": "l-fe8408",
+          "title": "Ein Brot, bitte",
+          "concepts": ["de:brot", "de:bitte", "de:danke"],
+          "steps": [
+            {
+              "type": "info",
+              "title": "Ordering",
+              "text": "**Ein Brot, bitte** = *a bread, please*. **Danke** = *thanks*.",
+              "say": "Ein Brot, bitte. Danke!",
+              "lang": "de-DE"
+            },
+            {
+              "type": "choice",
+              "prompt": "How do you say \"please\"?",
+              "options": ["danke", "bitte", "Brot"],
+              "answer": 1,
+              "explain": "bitte = please, danke = thanks.",
+              "misconceptions": {
+                "0": "danke means thanks."
+              }
+            },
+            {
+              "type": "translate",
+              "prompt": "A bread, please",
+              "answers": ["Ein Brot, bitte", "Ein Brot bitte", "Brot, bitte"],
+              "words": ["Ein", "Brot", "bitte", "danke", "Kaffee", "Morgen"]
+            },
+            {
+              "type": "listen",
+              "say": "Danke schön",
+              "lang": "de-DE",
+              "answers": ["danke schön", "danke schoen"]
+            },
+            {
+              "type": "translate",
+              "prompt": "Two bread rolls, please",
+              "answers": ["Zwei Brötchen, bitte", "Zwei Brötchen bitte"],
+              "words": ["Zwei", "Brötchen", "bitte", "Ein", "danke"]
+            },
+            {
+              "type": "numeric",
+              "prompt": "Two Brötchen cost €0.45 each. How much do you pay?",
+              "answer": 0.9,
+              "tolerance": 0.001,
+              "unit": "€",
+              "explain": "2 × 0,45 € = 0,90 € — in German: *neunzig Cent*."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "createdAt": "2026-10-25T15:09:23.088Z",
+  "updatedAt": "2026-10-25T15:09:25.817Z",
+  "version": 5
+}

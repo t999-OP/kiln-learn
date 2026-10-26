@@ -1,0 +1,31 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open a course…\n2. …"
+  - type: input
+    id: version
+    attributes:
+      label: Kiln version
+      placeholder: "e.g. 1.2.0 (see CHANGELOG.md or package.json)"
+  - type: dropdown
+    id: setup
+    attributes:
+      label: How do you run Kiln?
+      options: [docker compose, pnpm dev, node server.js, other]
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      render: shell

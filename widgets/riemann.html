@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="base.css" />
+    <script src="sdk.js"></script>
+  </head>
+  <body>
+    <div class="stage"><svg id="s" viewBox="0 0 560 300" width="560" height="300"></svg></div>
+    <div class="controls">
+      <div class="readout">
+        <span class="seg" id="method"
+          ><button data-m="left">Left</button><button data-m="mid">Middle</button><button data-m="right">Right</button></span
+        >
+        <span>estimate <span class="pill" id="est"></span></span><span>true area <span class="pill" id="exact"></span></span
+        ><span>error <span class="pill" id="err"></span></span>
+      </div>
+      <div class="ctl">
+        <label for="n">Rectangles</label><input id="n" type="range" min="1" max="60" step="1" value="2" /><output id="nv"></output>
+      </div>
+    </div>
+    <script type="module">
+      import { compile } from "./mathexpr.js";
+      import { makePlot, autoRange } from "./plot.js";
+      const $ = (id) => document.getElementById(id);
+      let P = { fn: "x^2", a: 0, b: 2, targetError: 0.05 },
+        f,
+        plot,
+        exact,
+        method = "left",
+        solved = false;
+
+      function simpson(a, b, N = 2000) {
+        const h = (b - a) / N;
+        let s = f(a) + f(b);
+        for (let i = 1; i < N; i++) s += f(a + i * h) * (i % 2 ? 4 : 2);
+        return (s * h) / 3;
+      }
+
+      function setup() {
+        f = compile(P.fn);
+        const X = P.x || [P.a - (P.b - P.a) * 0.15, P.b + (P.b - P.a) * 0.15];
+        const Y = P.y || autoRange([f], X);
+        exact = simpson(P.a, P.b);
+        method = P.method || "left";
+        $("s").replaceChildren();
+        plot = makePlot($("s"), { x: X, y: Y });
+        plot.grid();
+        plot.curve(f, { w: 3 });
+        $("exact").textContent = Number(exact.toFixed(4));
+        solved = false;
+        update(false);
+      }
+
+      function update(final) {
+        const n = Number($("n").value),
+          { a, b } = P,
+          w = (b - a) / n;
+        let sum = 0;
+        plot.dyn.clear();
+        for (let i = 0; i < n; i++) {
+          const xl = a + i * w;
+          const xs = method === "left" ? xl : method === "right" ? xl + w : xl + w / 2;
+          const h = f(xs);
+          sum += h * w;
+          plot.dyn.rect(xl, 0, xl + w, h, { fill: "var(--accent)", opacity: 0.28, stroke: "var(--accent)" });
+        }
+        const err = Math.abs(sum - exact);
+        $("nv").textContent = n;
+        $("est").textContent = Number(sum.toFixed(4));
+        $("err").textContent = Number(err.toFixed(4));
+        const ok = err <= (P.targetError ?? 0.05);
+        $("err").classList.toggle("ok", ok);
+        document.querySelectorAll("#method button").forEach((btn) => btn.classList.toggle("on", btn.dataset.m === method));
+        if (ok && final && !solved) {
+          solved = true;
+          Lesson.attempt({
+            correct: true,
+            feedback: `${n} ${method}-point rectangles give ${sum.toFixed(3)}, within ${err.toFixed(3)} of the true area ${exact.toFixed(3)}.`,
+          });
+        }
+      }
+
+      document.querySelectorAll("#method button").forEach((btn) => (btn.onclick = () => ((method = btn.dataset.m), update(true))));
+      Lesson.on("init", ({ params }) => {
+        P = { ...P, ...params };
+        $("n").value = 2;
+        setup();
+      });
+      $("n").addEventListener("input", () => update(false));
+      $("n").addEventListener("change", () => update(true));
+      setup();
+    </script>
+  </body>
+</html>

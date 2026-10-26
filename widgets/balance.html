@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="base.css" />
+    <script src="sdk.js"></script>
+  </head>
+  <body>
+    <div class="stage"><svg id="s" viewBox="0 0 560 260" width="560" height="260"></svg></div>
+    <div class="controls">
+      <div class="readout"><span class="pill" id="eq"></span><span class="pill" id="sides"></span></div>
+      <div class="ctl">
+        <label for="x">x =</label><input id="x" type="range" min="0" max="10" step="1" value="0" /><output id="xv"></output>
+      </div>
+    </div>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      let P = { a: 2, b: 3, c: 11 },
+        solved = false;
+      const blocks = (n, kind) => {
+        let out = "";
+        for (let i = 0; i < n; i++) {
+          const col = i % 6,
+            row = Math.floor(i / 6);
+          out +=
+            kind === "x"
+              ? `<g transform="translate(${col * 30},${-row * 30})"><rect x="0" y="-28" width="26" height="26" rx="5" fill="var(--blue)"/><text x="13" y="-10" fill="#fff" font-size="15" font-weight="900" text-anchor="middle">x</text></g>`
+              : `<g transform="translate(${col * 22},${-row * 22})"><rect x="0" y="-20" width="18" height="18" rx="4" fill="var(--accent)"/></g>`;
+        }
+        return out;
+      };
+      function draw(final) {
+        const x = Number($("x").value),
+          { a, b, c } = P;
+        const left = a * x + b,
+          diff = left - c;
+        const tilt = Math.max(-14, Math.min(14, -diff * 2.2)); // heavier side goes down
+        $("xv").textContent = x;
+        $("eq").textContent = `${a}x + ${b} = ${c}`;
+        $("sides").textContent = `left ${a}·${x} + ${b} = ${left}   ·   right ${c}`;
+        const ok = diff === 0;
+        $("sides").classList.toggle("ok", ok);
+        $("s").innerHTML = `
+    <polygon points="280,250 255,250 280,150 305,250" fill="var(--line)"/>
+    <g transform="rotate(${tilt} 280 150)">
+      <rect x="70" y="146" width="420" height="8" rx="4" fill="var(--muted)"/>
+      <g transform="translate(150,146)"><line x1="0" y1="0" x2="-60" y2="70" stroke="var(--muted)" stroke-width="2"/><line x1="0" y1="0" x2="60" y2="70" stroke="var(--muted)" stroke-width="2"/></g>
+      <g transform="translate(410,146)"><line x1="0" y1="0" x2="-60" y2="70" stroke="var(--muted)" stroke-width="2"/><line x1="0" y1="0" x2="60" y2="70" stroke="var(--muted)" stroke-width="2"/></g>
+      <g transform="translate(150,216) rotate(${-tilt})">
+        <rect x="-75" y="0" width="150" height="8" rx="4" fill="var(--ink)"/>
+        <g transform="translate(-72,-2)">${blocks(a, "x")}</g>
+        <g transform="translate(${-72 + Math.min(a, 6) * 30 + 4},-2)">${blocks(b, "1")}</g>
+      </g>
+      <g transform="translate(410,216) rotate(${-tilt})">
+        <rect x="-75" y="0" width="150" height="8" rx="4" fill="var(--ink)"/>
+        <g transform="translate(-66,-2)">${blocks(c, "1")}</g>
+      </g>
+    </g>
+    <text x="280" y="30" text-anchor="middle" font-size="16" font-weight="900" fill="${ok ? "var(--good)" : "var(--muted)"}">${ok ? "Balanced!" : diff > 0 ? "Left side is heavier" : "Right side is heavier"}</text>`;
+        if (ok && final && !solved) {
+          solved = true;
+          Lesson.attempt({ correct: true, feedback: `x = ${x}: ${a}·${x} + ${b} = ${c}.` });
+        }
+      }
+      Lesson.on("init", ({ params }) => {
+        P = { ...P, ...params };
+        $("x").value = 0;
+        draw(false);
+      });
+      $("x").addEventListener("input", () => draw(false));
+      $("x").addEventListener("change", () => draw(true));
+      draw(false);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,165 @@
+{
+  "spec": "0.1",
+  "id": "pendulums",
+  "title": "Why Pendulums Keep Time",
+  "subject": "science",
+  "description": "Discover what sets a pendulum's rhythm by experimenting — then use it to fix a clock and visit the Moon.",
+  "author": {
+    "name": "Kiln Team",
+    "kind": "human"
+  },
+  "visibility": "public",
+  "license": "CC-BY-SA-4.0",
+  "price": 0,
+  "units": [
+    {
+      "id": "u-swing",
+      "title": "The swing",
+      "lessons": [
+        {
+          "id": "l-mass",
+          "title": "Does weight matter?",
+          "concepts": ["physics:pendulum-period", "physics:mass-independence"],
+          "steps": [
+            {
+              "type": "predict",
+              "prompt": "You hang a heavier weight on the same pendulum. One full swing (the period) will take…",
+              "options": ["longer", "less time", "exactly the same time"],
+              "answer": 2,
+              "misconceptions": {
+                "0": "Most people guess this! Heavier things feel slower — let's test it.",
+                "1": "Gravity pulls harder on heavy things, but there's also more mass to move. Let's test it."
+              },
+              "explain": "Let's find out with a real experiment."
+            },
+            {
+              "type": "widget",
+              "widget": "pendulum",
+              "params": {
+                "startLength": 1
+              },
+              "goal": "Try at least 3 different masses and watch the period readout."
+            },
+            {
+              "type": "info",
+              "title": "Mass cancels out",
+              "text": "Gravity pulls a heavier bob **harder**, but a heavier bob is also **harder to accelerate**. The two effects cancel exactly — so the period doesn't depend on mass."
+            },
+            {
+              "type": "choice",
+              "prompt": "A 1 kg and a 5 kg bob hang on identical 1 m strings. Which swings faster?",
+              "options": ["The 1 kg bob", "The 5 kg bob", "Neither — same period"],
+              "answer": 2,
+              "explain": "Period depends on length and gravity, not mass."
+            },
+            {
+              "type": "predict",
+              "prompt": "Now make the string longer. The period will…",
+              "options": ["get longer", "get shorter", "stay the same"],
+              "answer": 0,
+              "misconceptions": {
+                "1": "A longer string means a longer arc to travel — so each swing takes more time.",
+                "2": "Unlike mass, length really matters. Try it!"
+              },
+              "explain": "Longer pendulums swing more slowly."
+            },
+            {
+              "type": "widget",
+              "widget": "pendulum",
+              "params": {
+                "targetPeriod": 2,
+                "tolerance": 0.05,
+                "startLength": 0.4
+              },
+              "goal": "Tune the pendulum so one full swing takes 2.0 seconds."
+            },
+            {
+              "type": "info",
+              "title": "The formula",
+              "text": "The period is **T = 2π√(L/g)** — L is the length, g ≈ 9.81 m/s² is gravity. Mass doesn't appear at all."
+            },
+            {
+              "type": "numeric",
+              "prompt": "What is the period of a 1 m pendulum on Earth? (g = 9.81 m/s²)",
+              "answer": 2.006,
+              "tolerance": 0.03,
+              "unit": "s",
+              "explain": "T = 2π√(1/9.81) ≈ 2.01 s. That's why old clocks use pendulums about 1 m long."
+            }
+          ]
+        },
+        {
+          "id": "l-clock",
+          "title": "Fix the clock",
+          "concepts": ["physics:pendulum-period", "physics:gravity"],
+          "steps": [
+            {
+              "type": "info",
+              "title": "Grandfather clocks",
+              "text": "A pendulum clock counts swings. If its pendulum swings **too slowly**, the clock falls behind."
+            },
+            {
+              "type": "choice",
+              "prompt": "A pendulum clock is running slow. How do you fix it?",
+              "options": ["Make the pendulum shorter", "Make the pendulum longer", "Use a heavier bob"],
+              "answer": 0,
+              "explain": "Shorter pendulum → shorter period → faster ticking.",
+              "misconceptions": {
+                "2": "Mass doesn't change the period — you discovered that last lesson!"
+              }
+            },
+            {
+              "type": "fill",
+              "prompt": "T = 2π√(L / ___)",
+              "answers": ["g"],
+              "hint": "The letter for gravitational acceleration"
+            },
+            {
+              "type": "match",
+              "prompt": "Match each symbol",
+              "pairs": [
+                ["T", "period"],
+                ["L", "length"],
+                ["g", "gravity"],
+                ["m", "mass (not in the formula!)"]
+              ]
+            },
+            {
+              "type": "predict",
+              "prompt": "You take the clock to the Moon, where gravity is 6× weaker. The clock will run…",
+              "options": ["faster", "slower", "the same"],
+              "answer": 1,
+              "misconceptions": {
+                "0": "Weaker gravity pulls the bob back more gently, so each swing takes longer.",
+                "2": "g is in the formula — gravity matters, unlike mass."
+              },
+              "explain": "Smaller g → bigger L/g → longer period → slower clock."
+            },
+            {
+              "type": "widget",
+              "widget": "pendulum",
+              "params": {
+                "targetPeriod": 2,
+                "tolerance": 0.06,
+                "startLength": 1,
+                "g": 1.62
+              },
+              "goal": "On the Moon (g = 1.62): make the pendulum tick every 2.0 s again."
+            },
+            {
+              "type": "numeric",
+              "prompt": "How long must a pendulum be on the Moon for a 2.0 s period? (g = 1.62 m/s²)",
+              "answer": 0.164,
+              "tolerance": 0.01,
+              "unit": "m",
+              "explain": "L = g·(T/2π)² = 1.62 × (2/2π)² ≈ 0.164 m — about 6× shorter than on Earth."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "createdAt": "2026-10-25T09:00:00.000Z",
+  "updatedAt": "2026-10-25T15:08:06.556Z",
+  "version": 3
+}

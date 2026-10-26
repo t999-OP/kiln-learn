@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="base.css" />
+    <script src="sdk.js"></script>
+  </head>
+  <body>
+    <div class="stage"><canvas id="c" width="560" height="270"></canvas></div>
+    <div class="controls">
+      <div class="readout">
+        <span>Period <span class="pill" id="T">–</span></span
+        ><span id="goal" class="pill target"></span><span id="tried" class="pill"></span>
+      </div>
+      <div class="ctl">
+        <label for="L">Length</label><input id="L" type="range" min="0.1" max="2.5" step="0.01" /><output id="Lv"></output>
+      </div>
+      <div class="ctl">
+        <label for="m">Mass</label><input id="m" type="range" min="0.2" max="5" step="0.1" value="1" /><output id="mv"></output>
+      </div>
+    </div>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const c = $("c"),
+        ctx = c.getContext("2d");
+      let P = {},
+        g = 9.81,
+        t0 = performance.now(),
+        tried = new Map(),
+        solved = false;
+      const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+      const period = () => 2 * Math.PI * Math.sqrt(Number($("L").value) / g);
+
+      function update(final) {
+        const L = Number($("L").value),
+          m = Number($("m").value),
+          T = period();
+        $("Lv").textContent = L.toFixed(2) + " m";
+        $("mv").textContent = m.toFixed(1) + " kg";
+        $("T").textContent = T.toFixed(2) + " s";
+        if (P.targetPeriod != null) {
+          const ok = Math.abs(T - P.targetPeriod) <= (P.tolerance ?? 0.05);
+          $("T").classList.toggle("ok", ok);
+          if (ok && final && !solved) {
+            solved = true;
+            Lesson.attempt({ correct: true, feedback: `Length ${L.toFixed(2)} m gives T = ${T.toFixed(2)} s.` });
+          }
+        } else if (final) {
+          tried.set(m.toFixed(1), T.toFixed(2));
+          $("tried").textContent = [...tried].map(([mm, tt]) => `${mm} kg → ${tt} s`).join(" · ");
+          if (tried.size >= 3 && !solved) {
+            solved = true;
+            $("T").classList.add("ok");
+            Lesson.attempt({ correct: true, feedback: `Every mass gave the same period: ${T.toFixed(2)} s.` });
+          }
+        }
+      }
+
+      function draw(now) {
+        const W = c.width,
+          H = c.height,
+          L = Number($("L").value),
+          m = Number($("m").value);
+        const T = period(),
+          theta = 0.38 * Math.cos((2 * Math.PI * ((now - t0) / 1000)) / T);
+        const px = 18 + (L / 2.5) * (H - 70),
+          ox = W / 2,
+          oy = 14;
+        const x = ox + px * Math.sin(theta),
+          y = oy + px * Math.cos(theta),
+          r = 9 + 7 * Math.cbrt(m);
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = css("--line");
+        ctx.fillRect(ox - 60, 6, 120, 8);
+        ctx.strokeStyle = css("--muted");
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.setLineDash([4, 6]);
+        ctx.strokeStyle = css("--line");
+        ctx.beginPath();
+        ctx.moveTo(ox, oy);
+        ctx.lineTo(ox, oy + px + r);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = css("--accent");
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 7);
+        ctx.fill();
+        ctx.fillStyle = css("--muted");
+        ctx.font = "700 13px system-ui";
+        ctx.fillText(g === 9.81 ? "Earth · g = 9.81 m/s²" : `g = ${g} m/s²${g < 2 ? " (Moon)" : ""}`, 10, 22);
+        requestAnimationFrame(draw);
+      }
+
+      Lesson.on("init", ({ params }) => {
+        P = params || {};
+        g = P.g ?? 9.81;
+        $("L").value = P.startLength ?? 0.5;
+        if (P.targetPeriod != null) $("goal").textContent = `Target ${P.targetPeriod.toFixed(2)} s`;
+        else {
+          $("L").disabled = true;
+          $("goal").textContent = "Try 3 different masses";
+        }
+        update(false);
+      });
+      for (const id of ["L", "m"]) {
+        $(id).addEventListener("input", () => update(false));
+        $(id).addEventListener("change", () => update(true));
+      }
+      $("L").value = 0.5;
+      update(false);
+      requestAnimationFrame(draw);
+    </script>
+  </body>
+</html>

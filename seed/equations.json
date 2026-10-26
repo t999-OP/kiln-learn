@@ -1,0 +1,109 @@
+{
+  "spec": "0.1",
+  "id": "equations",
+  "title": "Equations, Balanced",
+  "subject": "math",
+  "description": "See equations as balance scales and lines you can move — the visual way into algebra.",
+  "author": { "name": "Kiln Team", "kind": "human" },
+  "visibility": "public",
+  "license": "CC-BY-SA-4.0",
+  "price": 0,
+  "units": [
+    {
+      "id": "u-solve",
+      "title": "Solving for x",
+      "lessons": [
+        {
+          "id": "l-balance",
+          "title": "Balance the scale",
+          "concepts": ["math:linear-equation", "math:inverse-operations"],
+          "steps": [
+            {
+              "type": "info",
+              "title": "An equation is a balance",
+              "text": "**2x + 3 = 11** means: two boxes of weight *x* plus 3 weights balance 11 weights. Solving means finding *x*."
+            },
+            {
+              "type": "widget",
+              "widget": "balance",
+              "params": { "a": 2, "b": 3, "c": 11 },
+              "goal": "Pick the value of x that balances the scale."
+            },
+            {
+              "type": "choice",
+              "prompt": "To solve 2x + 3 = 11, what's a good first move?",
+              "options": ["Subtract 3 from both sides", "Add 3 to both sides", "Divide only the left side by 2"],
+              "answer": 0,
+              "explain": "Doing the same thing to both sides keeps the scale balanced: 2x = 8.",
+              "misconceptions": { "2": "Changing just one side tips the scale — always do it to both." }
+            },
+            {
+              "type": "numeric",
+              "prompt": "Solve 3x + 2 = 17. x = ?",
+              "answer": 5,
+              "tolerance": 0,
+              "explain": "Subtract 2 → 3x = 15, divide by 3 → x = 5."
+            },
+            { "type": "widget", "widget": "balance", "params": { "a": 3, "b": 1, "c": 13 }, "goal": "Balance 3x + 1 = 13." },
+            { "type": "fill", "prompt": "4x = 20, so x = ___", "answers": ["5"], "hint": "Divide both sides by 4" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u-lines",
+      "title": "Lines",
+      "lessons": [
+        {
+          "id": "l-lines",
+          "title": "Slope and intercept",
+          "concepts": ["math:slope", "math:intercept"],
+          "steps": [
+            {
+              "type": "info",
+              "title": "y = m·x + b",
+              "text": "**m** is the slope — how steep the line is. **b** is where the line crosses the y-axis."
+            },
+            {
+              "type": "predict",
+              "prompt": "If you make m bigger, the line becomes…",
+              "options": ["steeper", "flatter", "shifted up but equally steep"],
+              "answer": 0,
+              "misconceptions": { "2": "That's what changing b does. m controls steepness." },
+              "explain": "Bigger slope = steeper line."
+            },
+            {
+              "type": "widget",
+              "widget": "grapher",
+              "params": { "targetSlope": 2, "targetIntercept": 1 },
+              "goal": "Move the line so it passes through both orange points."
+            },
+            {
+              "type": "choice",
+              "prompt": "Where does y = 3x − 2 cross the y-axis?",
+              "options": ["at y = 3", "at y = −2", "at y = 2"],
+              "answer": 1,
+              "explain": "At x = 0, y = b = −2."
+            },
+            {
+              "type": "numeric",
+              "prompt": "What is the slope of the line through (0, 1) and (2, 5)?",
+              "answer": 2,
+              "tolerance": 0,
+              "explain": "Rise over run: (5 − 1) / (2 − 0) = 2."
+            },
+            {
+              "type": "widget",
+              "widget": "grapher",
+              "params": { "targetSlope": -1, "targetIntercept": 3 },
+              "goal": "Now a falling line: hit both points."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "createdAt": "2026-10-25T09:00:00.000Z",
+  "updatedAt": "2026-10-25T09:00:00.000Z",
+  "version": 1
+}

@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="base.css" />
+    <script src="sdk.js"></script>
+  </head>
+  <body>
+    <div class="stage"><svg id="s" viewBox="0 0 560 330" width="560" height="330"></svg></div>
+    <div class="controls">
+      <div class="readout">
+        <span>slope of f at x = <span class="pill" id="xv"></span> is <span class="pill" id="mv"></span></span
+        ><span class="pill target" id="cov"></span>
+      </div>
+      <div class="ctl"><label for="x">Sweep x</label><input id="x" type="range" step="0.01" /><output id="xo"></output></div>
+    </div>
+    <script type="module">
+      import { compile } from "./mathexpr.js";
+      import { makePlot, autoRange } from "./plot.js";
+      const $ = (id) => document.getElementById(id);
+      let P = { fn: "x^2", x: [-3, 3] },
+        f,
+        df,
+        top,
+        bottom,
+        X,
+        bins,
+        lastBin = null,
+        solved = false;
+      const BINS = 40;
+
+      function setup() {
+        f = compile(P.fn);
+        df = (x) => (f(x + 1e-5) - f(x - 1e-5)) / 2e-5;
+        X = P.x || [-3, 3];
+        const svg = $("s");
+        svg.replaceChildren();
+        const fy = P.y || autoRange([f], X);
+        top = makePlot(svg, { x: X, y: fy, height: 175, pad: 24 });
+        top.grid();
+        top.curve(f);
+        top.text(X[1], fy[0], "f(x)", { anchor: "end", dx: -4, dy: -6, color: "var(--blue)" });
+        const dy = P.dy || autoRange([df], X);
+        bottom = makePlot(svg, { x: X, y: dy, height: 155, top: 175, pad: 24 });
+        bottom.grid();
+        bottom.text(X[1], dy[0], "slope of f", { anchor: "end", dx: -4, dy: -6, color: "var(--accent)" });
+        Object.assign($("x"), { min: X[0], max: X[1] });
+        $("x").value = X[0] + (X[1] - X[0]) * 0.1;
+        bins = new Set();
+        lastBin = null;
+        solved = false;
+        update();
+      }
+
+      function update() {
+        const x = Number($("x").value),
+          y = f(x),
+          m = df(x);
+        // Count every bin the slider swept through, even if a fast drag skipped input events.
+        const bin = Math.min(BINS - 1, Math.floor(((x - X[0]) / (X[1] - X[0])) * BINS));
+        const from = lastBin ?? bin;
+        for (let b = Math.min(from, bin); b <= Math.max(from, bin); b++) bins.add(b);
+        lastBin = bin;
+        top.dyn.clear();
+        const half = (X[1] - X[0]) * 0.12;
+        top.dyn.line(x - half, y - m * half, x + half, y + m * half, { color: "var(--accent)", w: 3 });
+        top.dyn.point(x, y);
+        bottom.dyn.clear();
+        for (const b of bins) {
+          const bx = X[0] + ((b + 0.5) / BINS) * (X[1] - X[0]);
+          bottom.dyn.point(bx, df(bx), { r: 3.5, color: "var(--accent)" });
+        }
+        bottom.dyn.point(x, m, { r: 6 });
+        const cov = bins.size / BINS;
+        $("xv").textContent = x.toFixed(2);
+        $("mv").textContent = m.toFixed(2);
+        $("xo").textContent = x.toFixed(2);
+        $("cov").textContent = solved ? "Traced!" : `traced ${Math.round(cov * 100)}%`;
+        if (cov >= 0.85 && !solved) {
+          solved = true;
+          bottom.curve(df, { color: "var(--accent)", w: 2.5 });
+          $("cov").textContent = "Traced!";
+          $("cov").classList.remove("target");
+          $("cov").classList.add("ok");
+          Lesson.attempt({
+            correct: true,
+            feedback: P.reveal
+              ? `The curve you traced is the derivative: f′(x) = ${P.reveal}.`
+              : "The curve you traced is the derivative f′(x).",
+          });
+        }
+      }
+
+      Lesson.on("init", ({ params }) => {
+        P = { ...P, ...params };
+        setup();
+      });
+      $("x").addEventListener("input", update);
+      setup();
+    </script>
+  </body>
+</html>

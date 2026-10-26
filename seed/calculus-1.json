@@ -1,0 +1,312 @@
+{
+  "spec": "0.2",
+  "id": "calculus-1",
+  "title": "Calculus 1",
+  "subject": "math",
+  "description": "Limits, derivatives and integrals — discovered by experimenting with live graphs, then practiced with real math input.",
+  "author": {
+    "name": "Claude",
+    "kind": "agent",
+    "agent": "Claude",
+    "model": "claude-opus-5-5"
+  },
+  "visibility": "public",
+  "license": "CC-BY-SA-4.0",
+  "price": 0,
+  "units": [
+    {
+      "id": "u-da6b3d",
+      "title": "Limits",
+      "lessons": [
+        {
+          "id": "l-dd7fa4",
+          "title": "What is a limit?",
+          "concepts": ["calc:limit", "calc:removable-discontinuity", "calc:one-sided-limit"],
+          "steps": [
+            {
+              "type": "info",
+              "title": "Getting close",
+              "text": "A **limit** asks: as x gets closer and closer to some number a, what value does f(x) get close to?\n\nThe surprise: f doesn't even need a value *at* a. This graph has a hole at x = 1.",
+              "graph": {
+                "fns": ["(x^2-1)/(x-1)"],
+                "x": [-1, 3],
+                "y": [-1, 4],
+                "holes": [[1, 2]]
+              }
+            },
+            {
+              "type": "predict",
+              "prompt": "f(x) = (x² − 1)/(x − 1) is undefined at x = 1 (it would be 0/0). As x gets closer to 1, f(x) gets close to…",
+              "options": ["0", "1", "2", "nothing — it's undefined"],
+              "answer": 2,
+              "explain": "Let's test it by moving x toward 1.",
+              "misconceptions": {
+                "0": "0/0 isn't 0 — it's a sign that something cancels. Let's look closer.",
+                "3": "f(1) is undefined, but the limit asks about values *near* 1, not at 1."
+              }
+            },
+            {
+              "type": "widget",
+              "widget": "limit",
+              "params": {
+                "fn": "(x^2-1)/(x-1)",
+                "a": 1,
+                "x": [-1, 3],
+                "y": [-1, 4]
+              },
+              "goal": "Slide x toward 1 from both sides and watch f(x).",
+              "explain": "We write: lim(x→1) (x² − 1)/(x − 1) = 2."
+            },
+            {
+              "type": "info",
+              "title": "Why 2?",
+              "text": "Factor the top: (x² − 1) = (x − 1)(x + 1). For every x ≠ 1 the (x − 1) cancels, so f(x) = **x + 1** — and x + 1 → **2** as x → 1.\n\nWe write **lim(x→1) f(x) = 2**."
+            },
+            {
+              "type": "numeric",
+              "prompt": "Find lim(x→3) (x² − 9)/(x − 3).",
+              "answer": 6,
+              "tolerance": 0.001,
+              "explain": "x² − 9 = (x − 3)(x + 3), so the expression equals x + 3 near 3 → 3 + 3 = 6."
+            },
+            {
+              "type": "numeric",
+              "prompt": "This is sin(x)/x. It's undefined at x = 0. What is lim(x→0) sin(x)/x?",
+              "answer": 1,
+              "tolerance": 0.001,
+              "explain": "The graph closes in on height 1 from both sides — one of the most important limits in calculus.",
+              "graph": {
+                "fns": ["sin(x)/x"],
+                "x": [-10, 10],
+                "y": [-0.5, 1.3],
+                "holes": [[0, 1]]
+              }
+            },
+            {
+              "type": "choice",
+              "prompt": "What is lim(x→0) 1/x²?",
+              "options": ["0", "1", "It grows without bound (no finite limit)"],
+              "answer": 2,
+              "explain": "As x → 0, x² is tiny and positive, so 1/x² shoots up past every number. We write lim = ∞: no finite limit.",
+              "misconceptions": {
+                "0": "x² → 0, but 1 divided by something tiny is huge, not 0."
+              },
+              "graph": {
+                "fns": ["1/x^2"],
+                "x": [-3, 3],
+                "y": [-1, 12]
+              }
+            },
+            {
+              "type": "fill",
+              "prompt": "If f approaches different values from the left and from the right, the limit ___ exist.",
+              "answers": ["does not", "doesn't", "doesnt", "does not exist"],
+              "hint": "Both sides must agree"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u-0d96bc",
+      "title": "Derivatives",
+      "lessons": [
+        {
+          "id": "l-d42cbe",
+          "title": "The slope at a point",
+          "concepts": ["calc:secant", "calc:tangent", "calc:derivative", "calc:power-rule"],
+          "steps": [
+            {
+              "type": "info",
+              "title": "Slope between two points",
+              "text": "The slope of a curve between x = a and x = a + h is the slope of the **secant line**:\n\n**(f(a + h) − f(a)) / h**\n\nBut what's the slope *at* a single point?"
+            },
+            {
+              "type": "predict",
+              "prompt": "On f(x) = x², draw the secant from x = 1 to x = 1 + h. As h shrinks toward 0, the secant line becomes…",
+              "options": ["the tangent line at x = 1", "a vertical line", "it disappears"],
+              "answer": 0,
+              "explain": "Try it.",
+              "misconceptions": {
+                "1": "Both points stay on the curve and slide together — the line doesn't tip over.",
+                "2": "The two points merge, but the line through them settles into a limit."
+              }
+            },
+            {
+              "type": "widget",
+              "widget": "tangent",
+              "params": {
+                "fn": "x^2",
+                "a": 1,
+                "mode": "secant",
+                "x": [-1.5, 3],
+                "y": [-1, 8]
+              },
+              "goal": "Shrink h toward 0 and watch the slope of the secant."
+            },
+            {
+              "type": "info",
+              "title": "The derivative",
+              "text": "The slope at a point is a limit:\n\n**f′(a) = lim(h→0) (f(a + h) − f(a)) / h**\n\nFor f(x) = x² you just found f′(1) = 2."
+            },
+            {
+              "type": "widget",
+              "widget": "tangent",
+              "params": {
+                "fn": "x^2",
+                "a": 2,
+                "mode": "slope",
+                "x": [-1, 4],
+                "y": [-2, 12]
+              },
+              "goal": "Tune the slope until the line just touches the curve at x = 2.",
+              "explain": "So f′(2) = 4 for f(x) = x²."
+            },
+            {
+              "type": "widget",
+              "widget": "slopetracer",
+              "params": {
+                "fn": "x^2",
+                "x": [-3, 3],
+                "y": [-1, 9],
+                "dy": [-6.5, 6.5],
+                "reveal": "2x"
+              },
+              "goal": "Sweep x across the whole graph. The bottom panel records the slope at every point."
+            },
+            {
+              "type": "expression",
+              "prompt": "From the trace: if f(x) = x², what is f′(x)?",
+              "answer": "2x",
+              "explain": "Every slope was exactly twice x: f′(x) = 2x."
+            },
+            {
+              "type": "info",
+              "title": "The power rule",
+              "text": "For any power: **d/dx xⁿ = n·xⁿ⁻¹**\n\nBring the exponent down, then subtract one. x² → 2x, x³ → 3x². Constants have slope 0, and you can differentiate term by term."
+            },
+            {
+              "type": "expression",
+              "prompt": "f(x) = x³. Write f′(x).",
+              "answer": "3x^2",
+              "explain": "Bring down the 3, reduce the power: 3x²."
+            },
+            {
+              "type": "expression",
+              "prompt": "f(x) = 5x⁴ − 2x + 7. Write f′(x).",
+              "answer": "20x^3 - 2",
+              "explain": "5·4x³ = 20x³, the derivative of −2x is −2, and the constant 7 has slope 0."
+            },
+            {
+              "type": "numeric",
+              "prompt": "f(x) = x³. What is the slope of the tangent at x = 2?",
+              "answer": 12,
+              "tolerance": 0.001,
+              "explain": "f′(x) = 3x², so f′(2) = 3·4 = 12.",
+              "graph": {
+                "fns": ["x^3", "12x - 16"],
+                "x": [-1, 3],
+                "y": [-6, 20],
+                "points": [[2, 8]]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u-27ffbc",
+      "title": "Integrals",
+      "lessons": [
+        {
+          "id": "l-8c785e",
+          "title": "Area under a curve",
+          "concepts": ["calc:riemann-sum", "calc:definite-integral", "calc:antiderivative", "calc:ftc"],
+          "steps": [
+            {
+              "type": "predict",
+              "prompt": "To estimate the area under y = x² from 0 to 2 with rectangles, using more, thinner rectangles makes the estimate…",
+              "options": ["more accurate", "less accurate", "no different"],
+              "answer": 0,
+              "explain": "Let's measure it.",
+              "misconceptions": {
+                "1": "Thinner rectangles hug the curve more closely, leaving less gap.",
+                "2": "Watch the error as you add rectangles."
+              }
+            },
+            {
+              "type": "widget",
+              "widget": "riemann",
+              "params": {
+                "fn": "x^2",
+                "a": 0,
+                "b": 2,
+                "targetError": 0.1,
+                "x": [-0.3, 2.3],
+                "y": [-0.5, 4.5]
+              },
+              "goal": "Get the estimate within 0.1 of the true area. Add rectangles — or try another rectangle type."
+            },
+            {
+              "type": "info",
+              "title": "The definite integral",
+              "text": "As the rectangles get infinitely thin, the sum becomes exact. That limit is the **definite integral**:\n\n**∫₀² x² dx = 8/3 ≈ 2.667**"
+            },
+            {
+              "type": "info",
+              "title": "The shortcut: antiderivatives",
+              "text": "The **Fundamental Theorem of Calculus**: if F′ = f, then\n\n**∫ₐᵇ f(x) dx = F(b) − F(a)**\n\nF is an *antiderivative* — the derivative run backwards. Since (x³/3)′ = x², the area is 2³/3 − 0³/3 = 8/3."
+            },
+            {
+              "type": "expression",
+              "prompt": "Find an antiderivative F(x) of f(x) = x². (Any + C is fine.)",
+              "answer": "x^3/3",
+              "upToConstant": true,
+              "explain": "Raise the power by one and divide by the new power: x³/3 (+ C)."
+            },
+            {
+              "type": "expression",
+              "prompt": "Find an antiderivative of f(x) = 3x² + 2.",
+              "answer": "x^3 + 2x",
+              "upToConstant": true,
+              "explain": "3x² ← x³ and 2 ← 2x, so F(x) = x³ + 2x (+ C). Check: F′ = 3x² + 2."
+            },
+            {
+              "type": "numeric",
+              "prompt": "Compute ∫₀³ x² dx.",
+              "answer": 9,
+              "tolerance": 0.001,
+              "explain": "F(x) = x³/3, so F(3) − F(0) = 27/3 − 0 = 9.",
+              "graph": {
+                "fns": ["x^2"],
+                "x": [-0.5, 3.5],
+                "y": [-1, 11]
+              }
+            },
+            {
+              "type": "numeric",
+              "prompt": "Compute ∫₁² 2x dx.",
+              "answer": 3,
+              "tolerance": 0.001,
+              "explain": "F(x) = x², so F(2) − F(1) = 4 − 1 = 3."
+            },
+            {
+              "type": "choice",
+              "prompt": "Which function is an antiderivative of cos(x)?",
+              "options": ["sin(x)", "−sin(x)", "cos(x)", "−cos(x)"],
+              "answer": 0,
+              "explain": "(sin x)′ = cos x, so ∫cos x dx = sin x + C.",
+              "misconceptions": {
+                "1": "(−sin x)′ = −cos x — the sign is off.",
+                "3": "(−cos x)′ = sin x — that's the antiderivative of sin, not cos."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "createdAt": "2026-10-25T15:20:46.438Z",
+  "updatedAt": "2026-10-25T15:20:46.503Z",
+  "version": 7
+}

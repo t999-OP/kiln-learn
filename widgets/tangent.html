@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="base.css" />
+    <script src="sdk.js"></script>
+  </head>
+  <body>
+    <div class="stage"><svg id="s" viewBox="0 0 560 300" width="560" height="300"></svg></div>
+    <div class="controls">
+      <div class="readout">
+        <span id="what"></span><span>slope = <span class="pill" id="mv"></span></span><span class="pill target" id="goal"></span>
+      </div>
+      <div class="ctl"><label for="r" id="rl">h</label><input id="r" type="range" /><output id="rv"></output></div>
+    </div>
+    <script type="module">
+      import { compile } from "./mathexpr.js";
+      import { makePlot, autoRange } from "./plot.js";
+      const $ = (id) => document.getElementById(id);
+      let P = { fn: "x^2", a: 1, mode: "secant" },
+        f,
+        plot,
+        X,
+        Y,
+        d,
+        solved = false;
+
+      function setup() {
+        f = compile(P.fn);
+        X = P.x || [P.a - 3, P.a + 3];
+        Y = P.y || autoRange([f], X);
+        d = (f(P.a + 1e-6) - f(P.a - 1e-6)) / 2e-6;
+        $("s").replaceChildren();
+        plot = makePlot($("s"), { x: X, y: Y });
+        plot.grid();
+        plot.curve(f);
+        const r = $("r");
+        if (P.mode === "slope") {
+          Object.assign(r, { min: -10, max: 10, step: 0.1 });
+          r.value = 0;
+          $("rl").textContent = "Slope m";
+          $("goal").textContent = "Make the line touch the curve";
+          $("what").textContent = `line through (${P.a}, ${Number(f(P.a).toFixed(3))})`;
+        } else {
+          Object.assign(r, { min: 0, max: 1, step: 0.001 });
+          r.value = 0.05; // h ≈ 1.4 so Q starts on screen
+          $("rl").textContent = "Shrink h";
+          $("goal").textContent = "Shrink h below 0.01";
+          $("what").textContent = "secant through P and Q";
+        }
+        solved = false;
+        update(false);
+      }
+
+      function lineThrough(x0, y0, m, color, dash = "") {
+        plot.dyn.line(X[0], y0 + m * (X[0] - x0), X[1], y0 + m * (X[1] - x0), { color, w: 2.5, dash });
+      }
+
+      function update(final) {
+        const r = Number($("r").value),
+          a = P.a,
+          fa = f(a);
+        plot.dyn.clear();
+        let m;
+        if (P.mode === "slope") {
+          m = r;
+          $("rv").textContent = m.toFixed(1);
+          lineThrough(a, fa, m, "var(--accent)");
+          plot.dyn.point(a, fa);
+          const ok = Math.abs(m - d) <= (P.tolerance ?? 0.15);
+          $("mv").classList.toggle("ok", ok);
+          if (ok && final && !solved) {
+            solved = true;
+            Lesson.attempt({ correct: true, feedback: `That's the tangent line: its slope at x = ${a} is ${Number(d.toFixed(3))}.` });
+          }
+        } else {
+          const h = 2 * 10 ** (-3 * r);
+          m = (f(a + h) - fa) / h;
+          $("rv").textContent = `h = ${Number(h.toPrecision(2))}`;
+          lineThrough(a, fa, m, "var(--accent)");
+          plot.dyn.line(a + h, Y[0], a + h, f(a + h), { color: "var(--muted)", w: 1, dash: "3 4" });
+          plot.dyn.point(a, fa, { color: "var(--blue)" });
+          plot.dyn.point(a + h, f(a + h));
+          plot.dyn.text(a, fa, "P", { dx: -12, dy: -10, color: "var(--blue)" });
+          plot.dyn.text(a + h, f(a + h), "Q", { dx: 12, dy: -10, color: "var(--accent)" });
+          const ok = h <= 0.0105;
+          $("mv").classList.toggle("ok", ok);
+          if (ok && !solved) {
+            solved = true;
+            Lesson.attempt({
+              correct: true,
+              feedback: `As h → 0 the secant becomes the tangent, and its slope approaches ${Number(d.toFixed(3))}.`,
+            });
+          }
+        }
+        $("mv").textContent = Number(m.toFixed(4));
+      }
+
+      Lesson.on("init", ({ params }) => {
+        P = { ...P, ...params };
+        setup();
+      });
+      $("r").addEventListener("input", () => update(false));
+      $("r").addEventListener("change", () => update(true));
+      setup();
+    </script>
+  </body>
+</html>

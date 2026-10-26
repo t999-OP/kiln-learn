@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="base.css" />
+    <script src="sdk.js"></script>
+  </head>
+  <body>
+    <div class="stage"><svg id="s" viewBox="0 0 560 300" width="560" height="300"></svg></div>
+    <div class="controls">
+      <div class="readout">
+        <span>x = <span class="pill" id="xv"></span></span><span>f(x) = <span class="pill" id="fv"></span></span>
+        <span><span class="pill" id="left">from the left</span> <span class="pill" id="right">from the right</span></span>
+      </div>
+      <div class="ctl">
+        <label for="t">Move x</label><input id="t" type="range" min="-1" max="1" step="0.0005" value="-0.85" /><output
+          id="dv"
+          style="white-space: nowrap"
+        ></output>
+      </div>
+    </div>
+    <script type="module">
+      import { compile } from "./mathexpr.js";
+      import { makePlot, autoRange } from "./plot.js";
+      const $ = (id) => document.getElementById(id);
+      let P = { fn: "(x^2-1)/(x-1)", a: 1 },
+        f,
+        plot,
+        L,
+        span,
+        X,
+        near = { left: false, right: false },
+        solved = false;
+      const fmt = (v) => (Number.isFinite(v) ? String(Number(v.toFixed(5))) : "undefined");
+
+      function setup() {
+        f = compile(P.fn);
+        const a = P.a;
+        const x = (X = P.x || [a - 3, a + 3]);
+        const y = P.y || autoRange([f], x);
+        L = P.limit ?? Number(((f(a - 1e-7) + f(a + 1e-7)) / 2).toFixed(6));
+        span = Math.max(a - x[0], x[1] - a) * 0.95;
+        $("s").replaceChildren();
+        plot = makePlot($("s"), { x, y });
+        plot.grid();
+        plot.curve(f);
+        if (!Number.isFinite(f(a))) plot.point(a, L, { hollow: true, color: "var(--blue)" });
+        plot.line(a, y[0], a, y[1], { color: "var(--agent)", w: 1.5, dash: "3 5" });
+        plot.text(a, y[1], `x → ${a}`, { dy: 14, dx: 6, anchor: "start", color: "var(--agent)", size: 12 });
+        near = { left: false, right: false };
+        solved = false;
+        update(false);
+      }
+
+      function update(final) {
+        const t = Number($("t").value);
+        const a = P.a;
+        const xv = a + Math.sign(t) * Math.abs(t) ** 3 * span;
+        const fv = f(xv);
+        $("xv").textContent = fmt(xv);
+        $("fv").textContent = fmt(fv);
+        $("dv").textContent = `|x−${a}| ${Math.abs(xv - a) < 1e-9 ? "= 0" : "≈ " + Number(Math.abs(xv - a).toPrecision(2))}`;
+        plot.dyn.clear();
+        if (Number.isFinite(fv)) {
+          plot.dyn.line(xv, 0, xv, fv, { color: "var(--accent)", w: 1.5, dash: "4 4" });
+          plot.dyn.line(X[0], fv, xv, fv, { color: "var(--accent)", w: 1.5, dash: "4 4" });
+          plot.dyn.point(xv, fv);
+        }
+        const d = Math.abs(xv - a);
+        if (d > 1e-12 && d <= 0.01 && Number.isFinite(fv)) near[xv < a ? "left" : "right"] = true;
+        $("left").classList.toggle("done", near.left);
+        $("right").classList.toggle("done", near.right);
+        if (near.left && near.right && !solved) {
+          solved = true;
+          Lesson.attempt({ correct: true, feedback: `From both sides, f(x) closes in on ${L} as x → ${a}.` });
+        }
+      }
+
+      Lesson.on("init", ({ params }) => {
+        P = { ...P, ...params };
+        $("t").value = -0.85;
+        setup();
+      });
+      $("t").addEventListener("input", () => update(false));
+      setup();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,150 @@
+{
+  "spec": "0.1",
+  "id": "spanish-basics",
+  "title": "Spanish Basics",
+  "subject": "language",
+  "description": "Your first Spanish words: say hello, introduce yourself and order a coffee.",
+  "author": { "name": "Kiln Team", "kind": "human" },
+  "visibility": "public",
+  "license": "CC-BY-SA-4.0",
+  "price": 0,
+  "languages": { "target": "es-ES", "source": "en" },
+  "units": [
+    {
+      "id": "u-greet",
+      "title": "Greetings",
+      "lessons": [
+        {
+          "id": "l-hola",
+          "title": "Hola!",
+          "concepts": ["es:hola", "es:adios", "es:gracias"],
+          "steps": [
+            {
+              "type": "info",
+              "title": "Hola!",
+              "text": "**hola** means *hello*. It works any time of day.",
+              "say": "hola",
+              "lang": "es-ES"
+            },
+            {
+              "type": "choice",
+              "prompt": "What does \"hola\" mean?",
+              "options": ["Goodbye", "Hello", "Thank you"],
+              "answer": 1,
+              "explain": "Hola = hello.",
+              "say": "hola",
+              "lang": "es-ES"
+            },
+            {
+              "type": "info",
+              "title": "Two more",
+              "text": "**adiós** means *goodbye* and **gracias** means *thank you*.",
+              "say": "adiós. gracias.",
+              "lang": "es-ES"
+            },
+            {
+              "type": "match",
+              "prompt": "Match the pairs",
+              "pairs": [
+                ["hola", "hello"],
+                ["adiós", "goodbye"],
+                ["gracias", "thank you"]
+              ]
+            },
+            { "type": "listen", "say": "gracias", "lang": "es-ES", "answers": ["gracias"] },
+            {
+              "type": "translate",
+              "prompt": "Hello and goodbye",
+              "answers": ["Hola y adiós"],
+              "words": ["Hola", "y", "adiós", "gracias", "o"]
+            },
+            {
+              "type": "fill",
+              "prompt": "___, me voy. (Goodbye, I'm leaving.)",
+              "answers": ["adiós", "adios"],
+              "hint": "The word for goodbye"
+            }
+          ]
+        },
+        {
+          "id": "l-soy",
+          "title": "Introduce yourself",
+          "concepts": ["es:soy", "es:me-llamo"],
+          "steps": [
+            {
+              "type": "info",
+              "title": "I am…",
+              "text": "**soy** means *I am*. **Soy Ana** = *I am Ana*. You can also say **me llamo Ana** (*my name is Ana*).",
+              "say": "Soy Ana. Me llamo Ana.",
+              "lang": "es-ES"
+            },
+            {
+              "type": "choice",
+              "prompt": "How do you say \"I am Leo\"?",
+              "options": ["Eres Leo", "Soy Leo", "Es Leo"],
+              "answer": 1,
+              "explain": "soy = I am, eres = you are, es = he/she is.",
+              "misconceptions": { "0": "eres means *you are*.", "2": "es means *he/she is*." }
+            },
+            {
+              "type": "translate",
+              "prompt": "Hello, I am Ana",
+              "answers": ["Hola, soy Ana", "Hola, yo soy Ana", "Hola, me llamo Ana"],
+              "words": ["Hola", "soy", "Ana", "yo", "eres", "gracias"]
+            },
+            { "type": "listen", "say": "Me llamo Leo", "lang": "es-ES", "answers": ["me llamo leo"] },
+            { "type": "translate", "prompt": "My name is Sofía", "answers": ["Me llamo Sofía", "Mi nombre es Sofía", "Soy Sofía"] },
+            { "type": "fill", "prompt": "Hola, ___ Carlos.", "answers": ["soy", "me llamo"], "hint": "I am…" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "u-cafe",
+      "title": "At the café",
+      "lessons": [
+        {
+          "id": "l-cafe",
+          "title": "Un café, por favor",
+          "concepts": ["es:por-favor", "es:cafe", "es:agua"],
+          "steps": [
+            {
+              "type": "info",
+              "title": "Ordering",
+              "text": "**un café, por favor** = *a coffee, please*. **agua** = *water*.",
+              "say": "Un café, por favor.",
+              "lang": "es-ES"
+            },
+            {
+              "type": "choice",
+              "prompt": "What is \"por favor\"?",
+              "options": ["please", "thank you", "coffee", "water"],
+              "answer": 0,
+              "explain": "por favor = please."
+            },
+            {
+              "type": "match",
+              "pairs": [
+                ["café", "coffee"],
+                ["agua", "water"],
+                ["por favor", "please"],
+                ["gracias", "thank you"]
+              ]
+            },
+            {
+              "type": "translate",
+              "prompt": "A water, please",
+              "answers": ["Un agua, por favor", "Agua, por favor"],
+              "words": ["Un", "agua", "por", "favor", "café", "gracias"]
+            },
+            { "type": "listen", "say": "Un café, por favor", "lang": "es-ES", "answers": ["un cafe por favor"] },
+            { "type": "translate", "prompt": "Thank you, goodbye", "answers": ["Gracias, adiós", "Gracias y adiós"] }
+          ]
+        }
+      ]
+    }
+  ],
+  "createdAt": "2026-10-25T09:00:00.000Z",
+  "updatedAt": "2026-10-25T09:00:00.000Z",
+  "version": 1
+}

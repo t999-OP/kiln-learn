@@ -1,0 +1,40 @@
+# Self-host Kiln with Postgres:
+#   cp .env.example .env   # set KILN_SECRET, POSTGRES_PASSWORD and ORIGIN
+#   docker compose up -d
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kiln
+      POSTGRES_DB: kiln
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kiln -d kiln"]
+      interval: 5s
+      retries: 10
+
+  kiln:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://kiln:${POSTGRES_PASSWORD}@db:5432/kiln
+      KILN_SECRET: ${KILN_SECRET:?Set KILN_SECRET in .env (openssl rand -base64 32)}
+      ORIGIN: ${ORIGIN:-http://localhost:3000}
+      WIDGET_ORIGIN: ${WIDGET_ORIGIN:-}
+      KILN_NAME: ${KILN_NAME:-Kiln}
+      KILN_REGISTRATION: ${KILN_REGISTRATION:-open}
+      KILN_AI_CUSTOM_URLS: ${KILN_AI_CUSTOM_URLS:-admins}
+      KILN_IMPRINT_URL: ${KILN_IMPRINT_URL:-}
+      KILN_PRIVACY_URL: ${KILN_PRIVACY_URL:-}
+    ports:
+      - "3000:3000" # app
+      - "3001:3001" # widget sandbox origin
+
+volumes:
+  db:

@@ -1,0 +1,7 @@
+build
+.svelte-kit
+node_modules
+data
+drizzle/meta
+pnpm-lock.yaml
+LICENSE

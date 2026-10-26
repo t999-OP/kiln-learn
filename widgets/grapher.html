@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="base.css" />
+    <script src="sdk.js"></script>
+  </head>
+  <body>
+    <div class="stage"><svg id="s" viewBox="-6.5 -6.5 13 13" width="300" height="270" style="transform: scaleY(-1)"></svg></div>
+    <div class="controls">
+      <div class="readout">
+        <span>y = <span class="pill" id="eq"></span></span><span class="pill target" id="hint">Hit both orange points</span>
+      </div>
+      <div class="ctl">
+        <label for="m">Slope m</label><input id="m" type="range" min="-4" max="4" step="0.5" value="0.5" /><output id="mv"></output>
+      </div>
+      <div class="ctl">
+        <label for="b">Intercept b</label><input id="b" type="range" min="-5" max="5" step="0.5" value="0" /><output id="bv"></output>
+      </div>
+    </div>
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const S = $("s"),
+        NS = "http://www.w3.org/2000/svg";
+      let P = { targetSlope: 1, targetIntercept: 2 },
+        solved = false;
+      const el = (tag, attrs) => {
+        const e = document.createElementNS(NS, tag);
+        for (const k in attrs) e.setAttribute(k, attrs[k]);
+        S.append(e);
+        return e;
+      };
+      function grid() {
+        S.innerHTML = "";
+        for (let i = -6; i <= 6; i++) {
+          el("line", { x1: i, y1: -6, x2: i, y2: 6, stroke: "var(--line)", "stroke-width": i ? 0.03 : 0.07 });
+          el("line", { x1: -6, y1: i, x2: 6, y2: i, stroke: "var(--line)", "stroke-width": i ? 0.03 : 0.07 });
+        }
+      }
+      function targets() {
+        // Two target points on the hidden line, chosen to stay inside the view.
+        const xs = [-1, 2, 1, -2, 0, 3, -3];
+        const pts = xs.map((x) => [x, P.targetSlope * x + P.targetIntercept]).filter(([, y]) => Math.abs(y) <= 5.5);
+        return [pts[0], pts.find((p) => p[0] !== pts[0][0])];
+      }
+      function draw(final) {
+        const m = Number($("m").value),
+          b = Number($("b").value);
+        $("mv").textContent = m;
+        $("bv").textContent = b;
+        $("eq").textContent = `${m}·x ${b < 0 ? "−" : "+"} ${Math.abs(b)}`;
+        grid();
+        el("line", {
+          x1: -7,
+          y1: m * -7 + b,
+          x2: 7,
+          y2: m * 7 + b,
+          stroke: "var(--blue)",
+          "stroke-width": 0.12,
+          "stroke-linecap": "round",
+        });
+        const tol = P.tolerance ?? 0.1;
+        const ok = Math.abs(m - P.targetSlope) <= tol && Math.abs(b - P.targetIntercept) <= tol;
+        for (const [x, y] of targets()) {
+          const hit = Math.abs(m * x + b - y) < 0.05;
+          el("circle", { cx: x, cy: y, r: 0.32, fill: hit ? "var(--good)" : "var(--target)", stroke: "var(--bg)", "stroke-width": 0.08 });
+        }
+        $("eq").classList.toggle("ok", ok);
+        if (ok) $("hint").textContent = "Both points hit!";
+        if (ok && final && !solved) {
+          solved = true;
+          Lesson.attempt({ correct: true, feedback: `y = ${m}x ${b < 0 ? "−" : "+"} ${Math.abs(b)} goes through both points.` });
+        }
+      }
+      Lesson.on("init", ({ params }) => {
+        P = { ...P, ...params };
+        draw(false);
+      });
+      for (const id of ["m", "b"]) {
+        $(id).addEventListener("input", () => draw(false));
+        $(id).addEventListener("change", () => draw(true));
+      }
+      draw(false);
+    </script>
+  </body>
+</html>

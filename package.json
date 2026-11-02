@@ -41,7 +41,7 @@
     "@fontsource-variable/nunito": "^5.3.0",
     "@modelcontextprotocol/sdk": "^1.32.2",
     "drizzle-orm": "^0.45.4",
-    "postgres": "^3.4.9",
+    "postgres": "^4.0.0",
     "zod": "^4.6.7"
   },
   "imports": {
